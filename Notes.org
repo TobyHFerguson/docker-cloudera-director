@@ -1,0 +1,36 @@
+* Docker system for server and client
+
+** Build
+*** Server
+#+BEGIN_SRC shell
+docker build -f server-Dockerfile --tag tobyhferguson/director-server:6.0 .
+#+END_SRC
+*** Client
+#+BEGIN_SRC shell
+docker build -f client-Dockerfile --tag tobyhferguson/director-client:0.1 .
+#+END_SRC
+** Setup
+*** Create a User private network
+#+BEGIN_SRC shell
+docker network create director-network
+#+END_SRC
+*** Create log directories
+#+BEGIN_SRC sh
+mkdir ~/director-server-logs
+mkdir ~/director-client-logs
+#+END_SRC
+** Operation
+*** Server
+Run the server on the network, logging locally, with the hostname name director, using port 2345 for Director UI:
+#+BEGIN_SRC shell
+docker run --rm -v ${HOME}/director-server-logs:/home/director/logs --name director --network director-network -p 2345:7189 tobyhferguson/director-server:6.0
+#+END_SRC
+*** Client
+Execute the client with some command, using the normal args, but adding a pointer to the remote host. It is assumed that the path to the conf file is under the current working directory, so that is mounted to the ~/project~ directory in the container, along with the client log directory.
+
+Be sure to export all necessary envars, and then to reference them in the 
+#+BEGIN_SRC sh
+docker run -it -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -v $(pwd):/project -v $HOME/tmp/client-logs:/home/director/logs --network director-network tobyhferguson/director-client:0.1 validate-remote aws.conf --lp.remote.username=admin --lp.remote.password=admin --lp.remote.hostAndPort=director
+#+END_SRC
+
+

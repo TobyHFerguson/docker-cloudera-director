@@ -1,0 +1,45 @@
+# Copyright 2018 William A. Havanki, Jr.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+FROM openjdk:8-jre
+
+ARG version=6.0.0
+ARG majorVersion=6
+ARG TGZ_FILE=cloudera-director-client-${version}.tar.gz
+
+LABEL maintainer="havanki4j@gmail.com"
+LABEL description="Cloudera Director Server"
+
+RUN groupadd director && useradd -g director -m director
+USER director
+
+WORKDIR /home/director
+RUN curl -O http://archive.cloudera.com/director${majorVersion}/${version}/tars/${TGZ_FILE} && \
+  tar xzf ${TGZ_FILE} && \
+  rm ${TGZ_FILE}
+
+USER root
+RUN ln -s $(find $(pwd) -name cloudera-director -type f) /usr/local/bin/$(basename $(find $(pwd) -name cloudera-director -type f))
+RUN find /usr -name cloudera-director
+USER director
+
+RUN mkdir /home/director/logs
+VOLUME /home/director/logs
+
+ENV DIRECTOR_CLIENT_LOG_DIR=/home/director/logs
+
+WORKDIR /project
+
+ENTRYPOINT [ "cloudera-director"]
+CMD [ "--help"]
