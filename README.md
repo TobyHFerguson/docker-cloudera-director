@@ -1,6 +1,8 @@
 # docker-cloudera-director
 
-This project defines a [Docker](https://www.docker.com/) image for running the [Cloudera Director](https://www.cloudera.com/products/product-components/cloudera-director.html) server.
+This project defines [Docker](https://www.docker.com/) images for running a [Cloudera Director Server](https://www.cloudera.com/products/product-components/cloudera-director.html) and (optionally) the client.
+
+The [Dockery Hub tobyhferguson/cloudera-director](https://hub.docker.com/r/tobyhferguson/cloudera-director/) repo is the place to go figure out how to use this stuff. Here we just document how to build it.
 
 Current version: **6.0.0**
 
@@ -8,38 +10,27 @@ Current version: **6.0.0**
 
 Although I'm a developer who works on Cloudera Director, this is not an official Cloudera project, so do not expect support from Cloudera (or myself, potentially) for this project. Also, I'm not a Docker expert, so as usual, proceed with using this image at your own risk.
 
-## Usage
+## Build Yourself
 
-### Pull from Docker Hub
+There are two Dockerfiles, one for the server (`server-Dockerfile`) and one for the client (`client-Dockerfile`), located in the root of this repo.
 
-To get the latest:
-
-```
-docker pull havanki4j/cloudera-director
-```
-
-Browse the tags available at the [repository](https://hub.docker.com/r/havanki4j/cloudera-director/) to find images for different versions of Cloudera Director.
-
-### Build Yourself
-
-Assuming an image tag of "cloudera-director", run the Cloudera Director image:
+To build the images and tag them use:
 
 ```
-docker build -t cloudera-director .
-docker run -p 7189:7189 cloudera-director
+docker build -f server-Dockerfile --tag tobyhferguson/cloudera-director:server_6.0.0 .
+docker build -f client-Dockerfile --tag tobyhferguson/cloudera-director:client_6.0.0 .
 ```
 
-The image exposes TCP port 7189, so be sure to publish the port when running. Then, point your browser to the published port to use the Cloudera Director server UI.
+## Ports
+The server image exposes TCP port 7189, so be sure to publish the port when running. 
 
-To stop the container:
+## Volumes
 
-```
-docker stop <container-id>
-```
+The directories /home/director/db (server only) and /home/director/logs (client and server) are declared as volumes in the image for storing the Director database and logs, respectively. Save these volumes across container runs to keep state and log history. See Docker documentation for how to manage them.
 
-### Volumes
+## Entrypoints and Working Directory
 
-The directories /home/director/db and /home/director/logs are declared as volumes in the image for storing the Director database and logs, respectively. Save these volumes across container runs to keep state and log history. See Docker documentation for how to manage them.
+The client exposes the [cloudera director client[(https://www.cloudera.com/documentation/director/latest/topics/director_client_run.html#concept_sk4_d2x_wr) `cloudera-director` as its entrypoint, using a working directory of `/project' on the client. 
 
 ## License
 
