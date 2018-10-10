@@ -26,11 +26,11 @@ The server image exposes TCP port 7189, so be sure to publish the port when runn
 
 ## Volumes
 
-The directories /home/director/db (server only) and /home/director/logs (client and server) are declared as volumes in the image for storing the Director database and logs, respectively. Save these volumes across container runs to keep state and log history. See Docker documentation for how to manage them.
+The directories `/home/director/db` (server only) and `/home/director/logs` (client and server) are declared as volumes in the image for storing the Director database and logs, respectively. Save these volumes across container runs to keep state and log history. See Docker documentation for how to manage them.
 
 ## Entrypoints and Working Directory
 
-The client exposes the [cloudera director client[(https://www.cloudera.com/documentation/director/latest/topics/director_client_run.html#concept_sk4_d2x_wr) `cloudera-director` as its entrypoint, using a working directory of `/project' on the client. 
+The client exposes the [cloudera director client](https://www.cloudera.com/documentation/director/latest/topics/director_client_run.html#concept_sk4_d2x_wr) `cloudera-director` as its entrypoint, using a working directory of `/project` on the client. 
 
 ## License
 
