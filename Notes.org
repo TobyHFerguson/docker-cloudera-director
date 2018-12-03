@@ -25,6 +25,8 @@ Run the server on the network, logging locally, with the hostname name director,
 #+BEGIN_SRC shell
 docker run --rm -v ${HOME}/director-server-logs:/home/director/logs --name director --network director-network -p 2345:7189 tobyhferguson/director-server:6.0
 #+END_SRC
+
+Run the server mounting a 
 *** Client
 Execute the client with some command, using the normal args, but adding a pointer to the remote host. It is assumed that the path to the conf file is under the current working directory, so that is mounted to the ~/project~ directory in the container, along with the client log directory.
 

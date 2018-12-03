@@ -1,0 +1,58 @@
+* Useful Functions
+This directory contains some useful shell functions:
++ director :: runs the director server. Its db state is preserved in the docker =db= volume, so stopping the container and restarting it will result in the director starting from the same state.
++ validate :: director client - validates the given conf file
++ bootstrap :: director client - bootstraps a cluster from the given conf file
++ terminate :: director client - terminates the cluster built from the given conf file
++ convert :: director client - I don't know!
+
+simply execute =source bin/functions.sh= in the two bash shells (one for director server; one for the director client) and you'll have these functions available.
+
+* Conventions used
+These functions require some environment variables to be export, and conventions followed, to operate correctly.
+** Client Side
+When operating the client you need to export variables and ensure that the conf files follow convention as explained below:
+*** Log files
+Directories for the client and server log files must be created on your laptop and the following environment variable exported so that the docker container can write into them:
++ CLIENT_LOG_DIR :: client log directory
+Errors will be thrown if this envar isn't set (but what happens if they're set to something strange I'll let you figure out!)
+*** SSH
+To ensure that the SSH key is properly mounted and available in the docker container, /and/ used by the conf file, you must do the following two things:
+
+1. On the *client* side, make sure you export the variable =SSH_KEY_PATH= to be the full path to the SSH private key that you want to use to log into the machines that are built. 
+1. Ensure that the conf file contains this stanza:
+#+BEGIN_EXAMPLE
+ssh {
+    privateKey: ${SSH_KEY_PATH}
+}
+#+END_EXAMPLE
+
+Failures regarding the SSH key are likely because you forgot to do both of the above.
+** Server Side
+On the server side there seems to be a problem with the way that the GCP provider is authenticated. Basically the director server is filtering the =jsonKey= parameters and thus you can't put a GCP key directly into the conf file.
+*** Log files
+Directories for the client and server log files must be created on your laptop and the following environment variable exported so that the docker container can write into them:
++ SERVER_LOG_DIR :: server log directory
+Errors will be thrown if this envar isn't set (but what happens if they're set to something strange I'll let you figure out!)
+*** GCP
+If you're going to deploy conf file into GCP then you must export the variable =GOOGLE_APPLICATION_CREDENTIALS= (See [[https://cloud.google.com/sdk/gcloud/reference/auth/][gcloud auth]] for more information) to point at the necessary google key file for the GCP account from the shell in which you run =director=. This key file will be mounted into the docker image and the envar defined too.
+
+Failure to do this will result in the following error message on the client side:
+#+BEGIN_EXAMPLE
+Found errors in provider configuration:
+ * class ErrorInfo {
+    causes: []
+    errorCode: UNDEFINED
+    errorType: SERVICE
+    properties: {message=java.io.IOException: The Application Default Credentials are not available. They are available if running on Google App Engine, Google Compute Engine, or Google Cloud Shell. Otherwise, the environment variable GOOGLE_APPLICATION_CREDENTIALS must be defined pointing to a file defining the credentials. See https://developers.google.com/accounts/docs/application-default-credentials for more information.}
+#+END_EXAMPLE
+* Debugging
+I like to truncate the logs before I execute any function. It just makes looking for errors easier! The old logs are rarely of value to me:
+#+BEGIN_SRC 
+echo >${CLIENT_LOG_DIR:?}/application.log; echo >${SERVER_LOG_DIR:?}/application.log;
+#+END_SRC
+
+If you need to cat the logs then using the envars is the best way to do that too!
+
+If you run the client and it just quietly ends then go look in =$CLIENT_LOG_DIR/application.log=. It will help a lot if you do a =validate= before you do a =bootstrap=.
+

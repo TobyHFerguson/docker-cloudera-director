@@ -2,7 +2,7 @@
 
 This project defines [Docker](https://www.docker.com/) images for running a [Cloudera Director Server](https://www.cloudera.com/products/product-components/cloudera-director.html) and (optionally) the client.
 
-The [Dockery Hub tobyhferguson/cloudera-director](https://hub.docker.com/r/tobyhferguson/cloudera-director/) repo is the place to go figure out how to use this stuff. Here we just document how to build it.
+The [Docker Hub tobyhferguson/cloudera-director](https://hub.docker.com/r/tobyhferguson/cloudera-director/) repo is the place to go figure out how to use this stuff. Here we just document how to build it.
 
 Current version: **6.0.0**
 
