@@ -1,12 +1,9 @@
 * Useful Functions
-This directory contains some useful shell functions:
-+ director :: runs the director server. Its db state is preserved in the docker =db= volume, so stopping the container and restarting it will result in the director starting from the same state.
-+ validate :: director client - validates the given conf file
-+ bootstrap :: director client - bootstraps a cluster from the given conf file
-+ terminate :: director client - terminates the cluster built from the given conf file
-+ convert :: director client - I don't know!
-
-simply execute =source bin/functions.sh= in the two bash shells (one for director server; one for the director client) and you'll have these functions available.
+This directory contains some useful shell scripts:
++ director.sh :: runs the director server. Its db state is preserved in the docker =db= volume, so stopping the container and restarting it will result in the director starting from the same state.
++ validate.sh :: director client - validates the given conf file
++ bootstrap.sh :: director client - bootstraps a cluster from the given conf file
++ terminate.sh :: director client - terminates the cluster built from the given conf file
 
 * Conventions used
 These functions require some environment variables to be export, and conventions followed, to operate correctly.
@@ -29,13 +26,19 @@ ssh {
 
 Failures regarding the SSH key are likely because you forgot to do both of the above.
 ** Server Side
-On the server side there seems to be a problem with the way that the GCP provider is authenticated. Basically the director server is filtering the =jsonKey= parameters and thus you can't put a GCP key directly into the conf file.
 *** Log files
 Directories for the client and server log files must be created on your laptop and the following environment variable exported so that the docker container can write into them:
 + SERVER_LOG_DIR :: server log directory
 Errors will be thrown if this envar isn't set (but what happens if they're set to something strange I'll let you figure out!)
 *** GCP
-If you're going to deploy conf file into GCP then you must export the variable =GOOGLE_APPLICATION_CREDENTIALS= (See [[https://cloud.google.com/sdk/gcloud/reference/auth/][gcloud auth]] for more information) to point at the necessary google key file for the GCP account from the shell in which you run =director=. This key file will be mounted into the docker image and the envar defined too.
+If you're going to use GCP then you run the risk of putting your application key into the conf file and checking that in, inadverently.
+
+The best thing to do avoid this is:
+1. export the variable =GOOGLE_APPLICATION_CREDENTIALS= (See [[https://cloud.google.com/sdk/gcloud/reference/auth/][gcloud auth]] for more information) to point at the necessary google key file for the GCP account from the shell in which you run =director=. This key file will be mounted into the docker image and the envar defined too. 
+1. Run director from the above environment
+1. Comment out the =jsonKey= part of the conf file
+
+By doing the above three things then director will be able to use the key to access GCP, and you won't run the risk of checking in a key from your conf file.
 
 Failure to do this will result in the following error message on the client side:
 #+BEGIN_EXAMPLE
